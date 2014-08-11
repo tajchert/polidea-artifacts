@@ -1,0 +1,76 @@
+PATH
+  remote: .
+  specs:
+    polidea-artifacts (0.1.0)
+      CFPropertyList (~> 2.2.8)
+      rubyzip (~> 1.1.6)
+      travis-artifacts (~> 0.3.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    CFPropertyList (2.2.8)
+    builder (3.2.2)
+    diff-lcs (1.2.5)
+    excon (0.33.0)
+    faraday (0.9.0)
+      multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.9.1)
+      faraday (>= 0.7.4, < 0.10)
+    fog (1.22.1)
+      fog-brightbox
+      fog-core (~> 1.22)
+      fog-json
+      ipaddress (~> 0.5)
+      nokogiri (~> 1.5, >= 1.5.11)
+    fog-brightbox (0.1.1)
+      fog-core (~> 1.22)
+      fog-json
+      inflecto
+    fog-core (1.22.0)
+      builder
+      excon (~> 0.33)
+      formatador (~> 0.2)
+      mime-types
+      net-scp (~> 1.1)
+      net-ssh (>= 2.1.3)
+    fog-json (1.0.0)
+      multi_json (~> 1.0)
+    formatador (0.2.5)
+    inflecto (0.0.2)
+    ipaddress (0.8.0)
+    mime-types (2.3)
+    mini_portile (0.6.0)
+    multi_json (1.10.1)
+    multipart-post (2.0.0)
+    net-scp (1.2.1)
+      net-ssh (>= 2.6.5)
+    net-ssh (2.9.1)
+    nokogiri (1.6.3.1)
+      mini_portile (= 0.6.0)
+    rspec (3.0.0)
+      rspec-core (~> 3.0.0)
+      rspec-expectations (~> 3.0.0)
+      rspec-mocks (~> 3.0.0)
+    rspec-core (3.0.3)
+      rspec-support (~> 3.0.0)
+    rspec-expectations (3.0.3)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.0.0)
+    rspec-mocks (3.0.3)
+      rspec-support (~> 3.0.0)
+    rspec-support (3.0.3)
+    rubyzip (1.1.6)
+    travis-artifacts (0.3.0)
+      excon (~> 0.33.0)
+      faraday (~> 0.9.0)
+      faraday_middleware (~> 0.9.0)
+      fog (~> 1.22.0)
+      nokogiri (~> 1.6.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  polidea-artifacts!
+  rspec

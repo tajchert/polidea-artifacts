@@ -1,6 +1,5 @@
 require 'travis/artifacts'
 require 'FileUtils'
-require 'fog'
 
 module Polidea::Artifacts
 

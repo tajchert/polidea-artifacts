@@ -4,6 +4,7 @@ module Polidea
     autoload :ManifestGenerator,  'polidea/artifacts/manifest_generator'
     autoload :Config,             'polidea/artifacts/config'
     autoload :S3Uploader,         'polidea/artifacts/s3_uploader'
+    autoload :PageGenerator,      'polidea/artifacts/page_generator'
 
 
   end

@@ -1,5 +1,5 @@
 require 'pathname'
-require 'fileutils'
+require 'Fileutils'
 require 'zip'
 require 'cfpropertylist'
 
@@ -71,6 +71,10 @@ module Polidea::Artifacts
           artifact_paths << icon_file_name
         end
       end
+
+      #generate html
+      page_generator = PageGenerator.new
+      File.open("#{artifacts_dir}install.html", 'w') {|f| f.write(page_generator.generate_page_with_url("#{@upload_path}/manifest.plist"))}
     end
 
     def copy_artifact(file_name)

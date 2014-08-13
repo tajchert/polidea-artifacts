@@ -19,4 +19,5 @@ Gem::Specification.new do |s|
   s.executables   = s.files.grep(/^bin/).map{|f| File.basename(f) }
   s.test_files    = s.files.grep(/^spec/)
   s.require_paths = ['lib']
+
 end

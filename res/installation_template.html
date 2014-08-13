@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <h1>OTA installation</h1>
+    <% if @image_url != nil %>
+    <img src="<%= @image_url %>"/>
+    <% end %>
+    <h2><b><%= @app_name %></b></h2>
+    <ul>
+        <li>Version: <%= @app_version %></li>
+        <li>Date: <%= Time.now.strftime('%A, %d %B %Y, %H:%m') %></li>
+    </ul>
+    <a href="<%= @installation_link %>">Install</a>
+</body>
+</html>

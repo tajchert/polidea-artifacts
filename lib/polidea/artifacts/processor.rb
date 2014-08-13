@@ -29,52 +29,76 @@ module Polidea::Artifacts
     private
 
     def process_archive(path, artifact_paths)
-      manifest_file = "tmp/manifest.plist"
-
-      dirname = File.dirname(manifest_file)
-      unless File.directory?(dirname)
-        FileUtils.mkdir_p(dirname)
+      # remove old files and create directory if needed
+      unless File.directory?(artifacts_dir)
+        FileUtils.mkdir_p(artifacts_dir)
+      else
+        artifacts_path = Pathname.new(artifacts_dir) + '*'
+        FileUtils.rm_rf(Dir.glob(artifacts_path.to_s))
       end
 
-      # get file name without extension
-      ipa_name = Pathname.new(path).basename(".*")
-      unzipped_ipa_path = "tmp/zip_ipa/"
-      unzip_file(path, unzipped_ipa_path)
-
-      # process manifest
-      info_plist = CFPropertyList::List.new(:file => "#{unzipped_ipa_path}Payload/#{ipa_name}.app/Info.plist")
-      data = CFPropertyList.native_types(info_plist.value)
-      manifest_generator = ManifestGenerator.new
-
-      fd = IO.sysopen(manifest_file, "w")
-      file_stream = IO.new(fd, "w")
-
-      ipa_pathname = Pathname.new(path)
-      manifest_generator.create_manifest(file_stream, "#{@upload_path}/#{ipa_pathname.basename}", data['CFBundleIdentifier'], data['CFBundleShortVersionString'], data['CFBundleName'])
-      file_stream.close
-
-      copy_artifact(manifest_file)
+      # copy ipa to artifacts folder and file to artifacts to copy
       copy_artifact(path)
-
-      artifact_paths << "#{artifacts_dir}#{manifest_file}"
+      ipa_pathname = Pathname.new(path)
+      FileUtils.cp(path, artifacts_dir)
       artifact_paths << "#{artifacts_dir}#{ipa_pathname.basename}"
 
-      FileUtils.cp(path, artifacts_dir)
+      # generate manifest
+      parser = plist_parser!(path)
+      artifact_paths << generate_manifest(ipa_pathname, parser)
+
       # get icon
-      icon_paths = data['CFBundleIcons']
-      unless icon_paths.empty?
-        icon_file_names = icon_paths['CFBundlePrimaryIcon']['CFBundleIconFiles']
-        unless icon_file_names.empty?
-          icon_file_path = Dir["tmp/zip_ipa/Payload/#{ipa_name}.app/#{icon_file_names.first}*"].first
-          icon_file_name = "#{artifacts_dir}#{Pathname.new(icon_file_path).basename}"
-          copy_artifact("#{icon_file_path}")
-          artifact_paths << icon_file_name
-        end
-      end
+      icon_file_path = process_icon(artifact_paths, parser)
 
       #generate html
       page_generator = PageGenerator.new
-      File.open("#{artifacts_dir}install.html", 'w') {|f| f.write(page_generator.generate_page_with_url("#{@upload_path}/manifest.plist"))}
+      page_generator.app_name = parser.app_name
+      page_generator.app_version = parser.app_version
+      page_generator.image_url = "#{Pathname.new(icon_file_path).basename}"
+
+      installation_page_url = "#{artifacts_dir}install.html"
+      File.open(installation_page_url, 'w') {|f| f.write(page_generator.generate_page_with_ipa_url("#{@upload_path}/manifest.plist"))}
+      artifact_paths << installation_page_url
+    end
+
+    def process_icon(artifact_paths, parser)
+      icon_file_path = nil
+      icon_paths = parser.icon_files
+      unless icon_paths.nil? && icon_paths.empty?
+        icon_file_path = Dir["#{unzipped_ipa_path}Payload/#{@ipa_name}.app/#{icon_paths.first}*"].first
+        icon_file_name = "#{artifacts_dir}#{Pathname.new(icon_file_path).basename}"
+        copy_artifact("#{icon_file_path}")
+        artifact_paths << icon_file_name
+      end
+      icon_file_path
+    end
+
+    def plist_parser!(path)
+      # get file name without extension
+      @ipa_name = Pathname.new(path).basename('.*')
+      unzip_file(path, unzipped_ipa_path)
+
+      # process manifest
+      info_plist = CFPropertyList::List.new(:file => "#{unzipped_ipa_path}Payload/#{@ipa_name}.app/Info.plist")
+      data = CFPropertyList.native_types(info_plist.value)
+
+      InfoPlistParser.new(data)
+    end
+
+    def generate_manifest(ipa_pathname, plist_parser)
+
+      manifest_file = "#{artifacts_dir}manifest.plist"
+      manifest_generator = ManifestGenerator.new
+
+      fd = IO.sysopen(manifest_file, 'w')
+      file_stream = IO.new(fd, 'w')
+
+      app_name = plist_parser.app_name
+      app_version = plist_parser.app_version
+      manifest_generator.create_manifest(file_stream, "#{@upload_path}/#{ipa_pathname.basename}", plist_parser.bundle_id, app_version, app_name)
+      file_stream.close
+
+      "#{artifacts_dir}#{manifest_file}"
     end
 
     def copy_artifact(file_name)
@@ -92,5 +116,10 @@ module Polidea::Artifacts
         }
       }
     end
+
+    def unzipped_ipa_path
+      'tmp/zip_ipa/'
+    end
+
   end
 end

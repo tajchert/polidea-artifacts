@@ -30,6 +30,10 @@ module Polidea::Artifacts
       @plist_data['CFBundleIdentifier']
     end
 
+    def build_number
+      @plist_data['CFBundleVersion']
+    end
+
   end
 end
 

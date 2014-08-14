@@ -6,5 +6,6 @@ module Polidea
     autoload :PageGenerator,      'polidea/artifacts/page_generator'
     autoload :ManifestGenerator,  'polidea/artifacts/manifest_generator'
     autoload :InfoPlistParser,    'polidea/artifacts/info_plist_parser'
+    autoload :Cli,                'polidea/artifacts/cli'
   end
 end

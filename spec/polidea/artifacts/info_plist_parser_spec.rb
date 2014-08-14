@@ -25,5 +25,9 @@ module Polidea::Artifacts
     it 'should parse bundle id' do
       expect(parser.bundle_id).to eq('com.polidea.podstest')
     end
+
+    it 'should parse build number' do
+      expect(parser.build_number).to eq('2')
+    end
   end
 end

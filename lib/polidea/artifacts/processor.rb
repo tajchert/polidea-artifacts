@@ -1,20 +1,23 @@
 require 'pathname'
-require 'Fileutils'
+require 'fileutils'
 require 'zip'
+require 'securerandom'
 require 'cfpropertylist'
 
 module Polidea::Artifacts
   class Processor
 
+    attr_reader :project_name, :build_number, :build_version
+
     def initialize(upload_path)
-      @upload_path = upload_path
+      @bucket_url = upload_path
     end
 
     def process_paths(paths)
       artifact_paths = []
       paths.each do |path|
         if /.*\.ipa/.match(path)
-          process_archive(path, artifact_paths)
+          process_archive!(path, artifact_paths)
         else
           artifact_paths << path
         end
@@ -26,15 +29,19 @@ module Polidea::Artifacts
       'tmp/artifacts/'
     end
 
+    def upload_path
+      @upload_path ||= "#{@project_name}/#{@build_version}_#{@build_number}_#{SecureRandom.hex(16)}"
+    end
+
     private
 
-    def process_archive(path, artifact_paths)
+    def process_archive!(path, artifact_paths)
       # remove old files and create directory if needed
-      unless File.directory?(artifacts_dir)
-        FileUtils.mkdir_p(artifacts_dir)
-      else
+      if File.directory?(artifacts_dir)
         artifacts_path = Pathname.new(artifacts_dir) + '*'
         FileUtils.rm_rf(Dir.glob(artifacts_path.to_s))
+      else
+        FileUtils.mkdir_p(artifacts_dir)
       end
 
       # copy ipa to artifacts folder and file to artifacts to copy
@@ -43,8 +50,13 @@ module Polidea::Artifacts
       FileUtils.cp(path, artifacts_dir)
       artifact_paths << "#{artifacts_dir}#{ipa_pathname.basename}"
 
-      # generate manifest
+      # setup data
       parser = plist_parser!(path)
+      @project_name = parser.app_name
+      @build_number = parser.build_number
+      @build_version = parser.app_version
+
+      # generate manifest
       artifact_paths << generate_manifest(ipa_pathname, parser)
 
       # get icon
@@ -57,7 +69,7 @@ module Polidea::Artifacts
       page_generator.image_url = "#{Pathname.new(icon_file_path).basename}"
 
       installation_page_url = "#{artifacts_dir}install.html"
-      File.open(installation_page_url, 'w') {|f| f.write(page_generator.generate_page_with_ipa_url("#{@upload_path}/manifest.plist"))}
+      File.open(installation_page_url, 'w') {|f| f.write(page_generator.generate_page_with_ipa_url("#{@bucket_url}/#{upload_path}/manifest.plist"))}
       artifact_paths << installation_page_url
     end
 
@@ -86,7 +98,6 @@ module Polidea::Artifacts
     end
 
     def generate_manifest(ipa_pathname, plist_parser)
-
       manifest_file = "#{artifacts_dir}manifest.plist"
       manifest_generator = ManifestGenerator.new
 
@@ -95,7 +106,7 @@ module Polidea::Artifacts
 
       app_name = plist_parser.app_name
       app_version = plist_parser.app_version
-      manifest_generator.create_manifest(file_stream, "#{@upload_path}/#{ipa_pathname.basename}", plist_parser.bundle_id, app_version, app_name)
+      manifest_generator.create_manifest(file_stream, "#{@bucket_url}/#{upload_path}/#{ipa_pathname.basename}", plist_parser.bundle_id, app_version, app_name)
       file_stream.close
 
       "#{artifacts_dir}#{manifest_file}"

@@ -1,12 +1,10 @@
 require 'travis/artifacts'
-require 'FileUtils'
+require 'fileutils'
 
 module Polidea::Artifacts
 
   class S3Uploader
-    def initialize(base_path, aws_access_key, aws_bucket, aws_region, aws_secret)
-      @base_path = base_path
-
+    def initialize(aws_access_key, aws_bucket, aws_region, aws_secret)
       @config = Config.new
       ENV['ARTIFACTS_AWS_ACCESS_KEY_ID'] = aws_access_key
       ENV['ARTIFACTS_S3_BUCKET'] = aws_bucket
@@ -20,15 +18,14 @@ module Polidea::Artifacts
 
       puts bucket_url
 
-      upload_path = "#{bucket_url}#{@base_path}"
-      processor = Processor.new(upload_path)
+      processor = Processor.new(bucket_url)
       paths = processor.process_paths([path])
+      upload_path = "#{bucket_url}/#{processor.upload_path}"
 
       travis_artifacts_path_new = Travis::Artifacts::Path.new(processor.artifacts_dir, '', './')
-      s3_uploader = Travis::Artifacts::Uploader.new([travis_artifacts_path_new], {:target_path => @base_path})
+      s3_uploader = Travis::Artifacts::Uploader.new([travis_artifacts_path_new], {:target_path => processor.upload_path})
 
       s3_uploader.upload
-
 
       file_mapping = {}
       paths.each do |artifact_path|

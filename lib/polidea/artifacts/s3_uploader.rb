@@ -14,7 +14,7 @@ module Polidea::Artifacts
     end
 
     def upload(path)
-      bucket_url = "https://#{ENV['ARTIFACTS_S3_BUCKET']}.s3.amazonaws.com/"
+      bucket_url = "https://#{ENV['ARTIFACTS_S3_BUCKET']}.s3.amazonaws.com"
 
       puts bucket_url
 

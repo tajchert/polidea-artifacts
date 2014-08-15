@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'travis-artifacts',   '~> 0.3.0'
   s.add_dependency 'rubyzip',            '~> 1.1.6'
   s.add_dependency 'CFPropertyList',     '~> 2.2.8'
+  s.add_dependency 'dropbox-sdk',        '~> 1.6.4'
 
   s.add_development_dependency 'rspec'
 

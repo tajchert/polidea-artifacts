@@ -1,7 +1,7 @@
 require 'travis/artifacts'
 require 'fileutils'
 
-module Polidea::Artifacts
+module Polidea::Artifacts::Uploaders
 
   class S3Uploader
     def initialize(aws_access_key, aws_bucket, aws_region, aws_secret)

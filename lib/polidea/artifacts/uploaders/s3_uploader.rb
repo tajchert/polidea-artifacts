@@ -19,7 +19,7 @@ module Polidea::Artifacts::Uploaders
       puts bucket_url
 
       processor = Processor.new(bucket_url)
-      paths = processor.process_paths([path])
+      paths = processor.process_paths!([path])
       upload_path = "#{bucket_url}/#{processor.upload_path}"
 
       travis_artifacts_path_new = Travis::Artifacts::Path.new(processor.artifacts_dir, '', './')

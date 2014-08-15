@@ -26,6 +26,10 @@ module Polidea::Artifacts
       @config['s3_access_key']
     end
 
+    def dropbox_token
+      @config['dropbox-token']
+    end
+
     private
 
     def config_path

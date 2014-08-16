@@ -6,21 +6,51 @@ module Polidea::Artifacts
 
     context "processing iOS artifacts" do
       let(:artifact_paths) {["spec/res/PodsTest.ipa"]}
-      it "should add manifest file to artifacts" do
-        expect(processor.process_paths!(artifact_paths)).to include(/.*manifest.plist/)
+
+      context 'using basic processing' do
+        it "should add manifest file to artifacts" do
+          expect(processor.process_paths!(artifact_paths)).to include(/.*manifest.plist/)
+        end
+
+        it "should add app file to artifacts" do
+          expect(processor.process_paths!(artifact_paths)).to include(/.*PodsTest.ipa/)
+        end
+
+        it "should add icon file to the manifest" do
+          expect(processor.process_paths!(artifact_paths)).to include(/.*AppIcon60x60@2x.png/)
+        end
+
+        it "should add installation page to the manifest" do
+          expect(processor.process_paths!(artifact_paths)).to include(/.*install.html/)
+        end
       end
 
-      it "should add app file to artifacts" do
-        expect(processor.process_paths!(artifact_paths)).to include(/.*PodsTest.ipa/)
+      context 'using obfuscated processing' do
+
+        before do
+          processor.obfuscate_file_names = true
+        end
+        it "should add manifest file to artifacts" do
+          expect(processor.process_paths!(artifact_paths)).not_to include(/.*manifest.plist/)
+          expect(processor.process_paths!(artifact_paths)).to include(/.*.plist/)
+        end
+
+        it "should add app file to artifacts" do
+          expect(processor.process_paths!(artifact_paths)).not_to include(/.*PodsTest.ipa/)
+          expect(processor.process_paths!(artifact_paths)).to include(/.*.ipa/)
+        end
+
+        it "should add icon file to the manifest" do
+          expect(processor.process_paths!(artifact_paths)).not_to include(/.*AppIcon60x60@2x.png/)
+          expect(processor.process_paths!(artifact_paths)).to include(/.*.png/)
+        end
+
+        it "should add installation page to the manifest" do
+          expect(processor.process_paths!(artifact_paths)).not_to include(/.*install.html/)
+          expect(processor.process_paths!(artifact_paths)).to include(/.*.html/)
+        end
       end
 
-      it "should add icon file to the manifest" do
-        expect(processor.process_paths!(artifact_paths)).to include(/.*AppIcon60x60@2x.png/)
-      end
-
-      it "should add installation page to the manifest" do
-        expect(processor.process_paths!(artifact_paths)).to include(/.*install.html/)
-      end
     end
   end
 end

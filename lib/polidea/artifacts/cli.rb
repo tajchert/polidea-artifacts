@@ -10,7 +10,7 @@ module Polidea::Artifacts
 
     def initialize(argv = nil)
       @argv    = argv || ARGV
-      @options = {}
+      @options = { :obfuscate_names => false }
       @paths   = []
     end
 
@@ -22,7 +22,9 @@ module Polidea::Artifacts
 
     def upload
       if aws_key && aws_secret && aws_bucket && aws_region
-        Uploaders::S3Uploader.new(aws_key, aws_bucket, aws_region, aws_secret).upload(artifact)
+        uploader = Uploaders::S3Uploader.new(aws_key, aws_bucket, aws_region, aws_secret)
+        uploader.obfuscate_names = obfuscate_names
+        uploader.upload(artifact)
         return 0
       elsif dropbox_token
         Uploaders::DropboxUploader.new.upload(artifact, dropbox_token)
@@ -52,10 +54,6 @@ module Polidea::Artifacts
         STDERR.puts @opt_parser
         return 1
       end
-    end
-
-    def fetch_paths
-      options[:paths]
     end
 
     def parse!
@@ -107,11 +105,23 @@ module Polidea::Artifacts
             self.dropbox_token = token
           end
 
+          opt.on('--obfuscate_names', 'Obfuscate uploaded file names') do
+            self.obfuscate_names = true
+          end
+
           opt.on('-h','--help', 'help') do
             puts @opt_parser
           end
         end
       end
+    end
+
+    def obfuscate_names=(obfuscate)
+      options[:obfuscate_names] = obfuscate
+    end
+
+    def obfuscate_names
+      options[:obfuscate_names]
     end
 
     def dropbox_token=(token)

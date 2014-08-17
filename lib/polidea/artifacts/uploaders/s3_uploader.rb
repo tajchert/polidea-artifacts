@@ -1,4 +1,4 @@
-require 'travis/artifacts'
+require 'aws/s3'
 require 'fileutils'
 
 module Polidea::Artifacts::Uploaders
@@ -8,27 +8,32 @@ module Polidea::Artifacts::Uploaders
     attr_accessor :obfuscate_names
 
     def initialize(aws_access_key, aws_bucket, aws_region, aws_secret)
-      ENV['ARTIFACTS_AWS_ACCESS_KEY_ID'] = aws_access_key
-      ENV['ARTIFACTS_S3_BUCKET'] = aws_bucket
-      ENV['ARTIFACTS_AWS_SECRET_ACCESS_KEY'] = aws_secret
-      ENV['ARTIFACTS_AWS_REGION'] = aws_region
+      @access_key = aws_access_key
+      @bucket = aws_bucket
+      @secret = aws_secret
+      @region = aws_region
 
     end
 
     def upload(path)
-      bucket_url = "https://#{ENV['ARTIFACTS_S3_BUCKET']}.s3.amazonaws.com"
+      s3 = AWS::S3.new(:access_key_id => @access_key, :secret_access_key => @secret, :region => @region)
+      bucket = s3.buckets[@bucket]
+
+      bucket_url = bucket.url
+
+      puts bucket_url
 
       # TODO check how to do it better
       processor = Polidea::Artifacts::Processor.new(bucket_url)
       processor.obfuscate_file_names = obfuscate_names
       paths = processor.process_paths!([path])
-      upload_path = "#{bucket_url}/#{processor.upload_path}"
+      upload_path = Pathname.new(bucket_url) + processor.upload_path
 
-      travis_artifacts_path_new = Travis::Artifacts::Path.new(processor.artifacts_dir.to_s, '', './')
-      s3_uploader = Travis::Artifacts::Uploader.new([travis_artifacts_path_new], {:target_path => processor.upload_path})
-
-      puts paths.inspect
-      s3_uploader.upload
+      paths.each do |f|
+        pathname = Pathname.new(processor.upload_path) + Pathname.new(f).basename
+        obj = bucket.objects[pathname]
+        obj.write(Pathname.new(f))
+      end
 
       file_mapping = {}
       paths.each do |artifact_path|

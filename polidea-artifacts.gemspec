@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.authors     = ['blazej.marcinkiewicz@polidea.com']
   s.email       = 'blazej.marcinkiewicz@polidea.com'
 
-  s.add_dependency 'travis-artifacts',   '~> 0.3.0'
+  s.add_dependency 'aws-sdk',            '~> 1.51.0'
   s.add_dependency 'rubyzip',            '~> 1.1.6'
   s.add_dependency 'CFPropertyList',     '~> 2.2.8'
   s.add_dependency 'dropbox-sdk',        '~> 1.6.4'

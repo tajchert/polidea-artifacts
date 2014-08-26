@@ -7,9 +7,9 @@ module Polidea::Artifacts
       let(:artifact_paths) {["spec/res/PodsTest.apk"]}
       context 'Android using basic processing' do
         #TODO here
-        #it "should add manifest file to artifacts" do
-        #  expect(processor.process_paths!(artifact_paths)).to include(/.*manifest.plist/)
-        #end
+        it "should add manifest file to artifacts" do
+          processor.process_paths!(artifact_paths)
+        end
       end
     end
 

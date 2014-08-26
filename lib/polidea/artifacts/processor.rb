@@ -3,6 +3,7 @@ require 'fileutils'
 require 'zip'
 require 'securerandom'
 require 'cfpropertylist'
+require 'ruby_apk'
 
 module Polidea::Artifacts
   class Processor
@@ -19,10 +20,10 @@ module Polidea::Artifacts
       artifact_paths = []
       paths.each do |path|
         if /.*\.ipa/.match(path)
-          process_archive!(path, artifact_paths)
+          #process_archive!(path, artifact_paths)
           end
         if /.*\.apk/.match(path)
-          #process_android_archive!(path, artifact_paths)
+          process_android_archive!(path, artifact_paths)
         else
           artifact_paths << path
         end
@@ -88,25 +89,46 @@ module Polidea::Artifacts
         FileUtils.mkdir_p(artifacts_android_dir)
       end
 
-      # copy ipa to artifacts folder and file to artifacts to copy
-      ipa_pathname = copy_artifact(path, artifact_paths)
+      # copy apk to artifacts folder
+      copy_artifact(path, artifact_paths)
 
-      # setup data
-      parser = plist_parser!(path)
-      @project_name = parser.app_name
-      @build_number = parser.build_number
-      @build_version = parser.app_version
+      #Setup data
+      apk = Android::Apk.new(path)
+      @project_name = apk.manifest.label
+      @build_number = apk.manifest.version_name
+      @build_version = apk.manifest.version_code
 
-      # generate manifest
-      manifest_path = copy_artifact(generate_manifest(ipa_pathname, parser), artifact_paths)
+      unzipped_path = Pathname.new(unzipped_apk_path) + "Payload/#{@project_name}.app/*"
+      # generate manifest (readable xml form)
+      File.open(File.basename("AndroidManifest.xml"), 'wb') {|f| f.write (apk.manifest.to_xml) }
+      if File.file?("AndroidManifest.xml")
+        manifest_path = copy_artifact("AndroidManifest.xml", artifact_paths)
+        FileUtils.rm("AndroidManifest.xml")
+      end
+      #manifest end
 
+      
       # get icon
-      icon_file_path = process_icon(artifact_paths, parser)
+      icons = apk.icon # { "res/drawable-hdpi/ic_launcher.png" => "\x89PNG\x0D\x0A...", ... }
+      name_most_x = 0
+      icons.each do |name, data|
+        if (name.count "x")  > name_most_x
+          name_most_x = name.count "x"
+          STDOUT.puts name.count "x"
+          File.open(File.basename("icon.png"), 'wb') {|f| f.write data } # save to file.
+        end
+      end
+      if File.file?("icon.png")
+        icon_file_path = copy_artifact("icon.png", artifact_paths)
+        FileUtils.rm("icon.png")
+      end
+      #icon end
+
 
       #generate html
       page_generator = PageGenerator.new
-      page_generator.app_name = parser.app_name
-      page_generator.app_version = parser.app_version
+      page_generator.app_name = @project_name
+      page_generator.app_version = @build_version
       page_generator.image_url = "#{Pathname.new(icon_file_path).basename}"
 
       installation_page_url = Pathname.new(tmp_dir) + 'install.html'
@@ -164,6 +186,24 @@ module Polidea::Artifacts
         path = obfuscated_file_name
       else
         FileUtils.cp(file_name, artifacts_dir)
+        path = artifacts_dir + file_path.basename
+      end
+      artifact_paths << path.to_s
+      path
+    end
+
+    def create_artifact(file_name, data, artifact_paths)
+      unless File.directory?(artifacts_dir)
+        FileUtils.mkdir_p(artifacts_dir)
+      end
+      path = nil
+      file_path = Pathname.new(file_name)
+      if obfuscate_file_names
+        obfuscated_file_name = artifacts_dir + Pathname.new("#{SecureRandom.hex(16)}#{file_path.extname}")
+        File.open(obfuscated_file_name, 'w') { |file| file.write(data) }
+        path = obfuscated_file_name
+      else
+        File.open(artifacts_dir + file_name, 'w') { |file| file.write(data) }
         path = artifacts_dir + file_path.basename
       end
       artifact_paths << path.to_s

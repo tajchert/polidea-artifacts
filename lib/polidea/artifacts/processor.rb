@@ -19,7 +19,10 @@ module Polidea::Artifacts
       artifact_paths = []
       paths.each do |path|
         if /.*\.ipa/.match(path)
-          process_archive!(path, artifact_paths)
+          #process_archive!(path, artifact_paths)
+          end
+        if /.*\.apk/.match(path)
+          process_android_archive!(path, artifact_paths)
         else
           artifact_paths << path
         end
@@ -29,6 +32,10 @@ module Polidea::Artifacts
 
     def artifacts_dir
       @artifacts_dir ||= tmp_dir + 'artifacts'
+    end
+
+    def artifacts_android_dir
+      @artifacts_dir ||= tmp_apk_dir + 'artifacts'
     end
 
     def upload_path
@@ -44,6 +51,41 @@ module Polidea::Artifacts
         FileUtils.rm_rf(Dir.glob(artifacts_path))
       else
         FileUtils.mkdir_p(artifacts_dir)
+      end
+
+      # copy ipa to artifacts folder and file to artifacts to copy
+      ipa_pathname = copy_artifact(path, artifact_paths)
+
+      # setup data
+      parser = plist_parser!(path)
+      @project_name = parser.app_name
+      @build_number = parser.build_number
+      @build_version = parser.app_version
+
+      # generate manifest
+      manifest_path = copy_artifact(generate_manifest(ipa_pathname, parser), artifact_paths)
+
+      # get icon
+      icon_file_path = process_icon(artifact_paths, parser)
+
+      #generate html
+      page_generator = PageGenerator.new
+      page_generator.app_name = parser.app_name
+      page_generator.app_version = parser.app_version
+      page_generator.image_url = "#{Pathname.new(icon_file_path).basename}"
+
+      installation_page_url = Pathname.new(tmp_dir) + 'install.html'
+      File.open(installation_page_url, 'w') {|f| f.write(page_generator.generate_page_with_ipa_url(Pathname.new(@base_upload_url) + Pathname.new(upload_path) + manifest_path))}
+      copy_artifact(installation_page_url, artifact_paths)
+    end
+
+    def process_android_archive!(path, artifact_paths)
+      # remove old files and create directory if needed
+      if File.directory?(artifacts_android_dir)
+        artifacts_path = artifacts_android_dir + '*'
+        FileUtils.rm_rf(Dir.glob(artifacts_path))
+      else
+        FileUtils.mkdir_p(artifacts_android_dir)
       end
 
       # copy ipa to artifacts folder and file to artifacts to copy
@@ -143,6 +185,14 @@ module Polidea::Artifacts
 
     def tmp_dir
       @tmp_dir ||= Pathname.new('tmp')
+    end
+
+    def unzipped_apk_path
+      @unzipped_apk_path ||= tmp_apk_dir + 'zip_apk'
+    end
+
+    def tmp_apk_dir
+      @tmp_apk_dir ||= Pathname.new('tmp_android')
     end
 
   end

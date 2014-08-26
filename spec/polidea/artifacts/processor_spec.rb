@@ -3,6 +3,14 @@ require 'spec_helper'
 module Polidea::Artifacts
   describe Processor do
     let(:processor) { Processor.new('') }
+    context "processing Android artifacts" do
+      let(:artifact_paths) {["spec/res/PodsTest.apk"]}
+      context 'Android using basic processing' do
+        it "should add manifest file to artifacts" do
+           expect(processor.process_paths!(artifact_paths)).to include(/.*manifest.plist/)
+          end
+      end
+    end
 
     context "processing iOS artifacts" do
       let(:artifact_paths) {["spec/res/PodsTest.ipa"]}
@@ -52,5 +60,6 @@ module Polidea::Artifacts
       end
 
     end
+
   end
 end

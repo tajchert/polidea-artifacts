@@ -19,10 +19,10 @@ module Polidea::Artifacts
       artifact_paths = []
       paths.each do |path|
         if /.*\.ipa/.match(path)
-          #process_archive!(path, artifact_paths)
+          process_archive!(path, artifact_paths)
           end
         if /.*\.apk/.match(path)
-          process_android_archive!(path, artifact_paths)
+          #process_android_archive!(path, artifact_paths)
         else
           artifact_paths << path
         end

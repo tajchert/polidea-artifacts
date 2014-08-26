@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/tajchert/ruby_apk.git
+  revision: 03b6b054973df02efd765ddfd0cda6ed129b8564
+  specs:
+    ruby_apk (0.7.1)
+
 PATH
   remote: .
   specs:
@@ -41,3 +47,4 @@ PLATFORMS
 DEPENDENCIES
   polidea-artifacts!
   rspec
+  ruby_apk!

@@ -6,13 +6,15 @@ Gem::Specification.new do |s|
   s.summary     = s.description
 
   s.homepage    = 'https://github.com/Polidea/polidea-artifacts'
-  s.authors     = ['blazej.marcinkiewicz@polidea.com']
+  s.authors     = ['blazej.marcinkiewicz@polidea.com', 'michal.tajchert@polidea.com', 'ruby_apk - SecureBrain, github.com/securebrain/ruby_apk']
   s.email       = 'blazej.marcinkiewicz@polidea.com'
 
   s.add_dependency 'aws-sdk',            '~> 1.51.0'
   s.add_dependency 'rubyzip',            '~> 1.1.6'
   s.add_dependency 'CFPropertyList',     '~> 2.2.8'
   s.add_dependency 'dropbox-sdk',        '~> 1.6.4'
+  s.add_dependency 'rqrcode_png',        '~> 0.1.2'
+  s.add_dependency 'shorturl',           '~> 1.0.0'
 
   s.add_development_dependency 'rspec'
 

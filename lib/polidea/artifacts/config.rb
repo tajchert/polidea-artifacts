@@ -7,8 +7,10 @@ module Polidea::Artifacts
     attr_reader :config
 
     def initialize
+      @config = Hash.new
       if File.exists?(config_path)
         @config = YAML.load_file(config_path)
+        puts @config.inspect
       else
         @config = {}
       end

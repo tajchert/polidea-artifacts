@@ -25,6 +25,8 @@ module Polidea::Artifacts
         uploader = Uploaders::S3Uploader.new(aws_key, aws_bucket, aws_region, aws_secret)
         uploader.obfuscate_names = obfuscate_names
         uploader.upload(artifact)
+        config = Config.new
+
         return 0
       elsif dropbox_token
         Uploaders::DropboxUploader.new.upload(artifact, dropbox_token)

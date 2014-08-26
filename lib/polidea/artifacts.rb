@@ -3,6 +3,7 @@ module Polidea
     autoload :Processor,          'polidea/artifacts/processor'
     autoload :Config,             'polidea/artifacts/config'
     autoload :PageGenerator,      'polidea/artifacts/page_generator'
+    autoload :MailGenerator,      'polidea/artifacts/mail_generator'
     autoload :ManifestGenerator,  'polidea/artifacts/manifest_generator'
     autoload :InfoPlistParser,    'polidea/artifacts/info_plist_parser'
     autoload :Cli,                'polidea/artifacts/cli'
@@ -12,3 +13,5 @@ module Polidea
     end
   end
 end
+
+

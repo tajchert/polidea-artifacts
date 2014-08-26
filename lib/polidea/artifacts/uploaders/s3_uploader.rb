@@ -1,5 +1,6 @@
 require 'aws/s3'
 require 'fileutils'
+require 'rqrcode_png'
 
 module Polidea::Artifacts::Uploaders
 
@@ -35,6 +36,10 @@ module Polidea::Artifacts::Uploaders
         obj.write(Pathname.new(f), :acl => :public_read)
       end
 
+      mail_generator = Polidea::Artifacts::MailGenerator.new
+      #mail_generator.folder_loc = upload_path
+      # mail_generator.app_version = @build_version
+      # mail_generator.image_url = "#{Pathname.new(icon_file_path).basename}"
       file_mapping = {}
       paths.each do |artifact_path|
         pathname = Pathname.new(upload_path)
@@ -42,8 +47,18 @@ module Polidea::Artifacts::Uploaders
         unless key.nil?
           pathname = pathname + "#{Pathname.new(artifact_path).basename}"
           file_mapping[key] = "#{pathname.to_s}"
+          puts key.to_s
+          puts pathname.to_s
+          if key.to_s == "installation_page"
+            mail_generator.installation_website_url = pathname.to_s
+          end
+          if key.to_s == "icon"
+            mail_generator.image_url = pathname.to_s
+          end
         end
       end
+      mail_generator.generate_qr_code(mail_generator.installation_website_url)
+
 
       puts '====='
       puts 'Uploaded artifacts:'

@@ -3,7 +3,6 @@ require 'fileutils'
 require 'zip'
 require 'securerandom'
 require 'cfpropertylist'
-require 'ruby_apk'
 
 module Polidea::Artifacts
   class Processor
@@ -20,7 +19,7 @@ module Polidea::Artifacts
       artifact_paths = []
       paths.each do |path|
         if /.*\.ipa/.match(path)
-          #process_archive!(path, artifact_paths)
+          process_archive!(path, artifact_paths)
           end
         if /.*\.apk/.match(path)
           process_android_archive!(path, artifact_paths)
@@ -98,7 +97,6 @@ module Polidea::Artifacts
       @build_number = apk.manifest.version_name
       @build_version = apk.manifest.version_code
 
-      unzipped_path = Pathname.new(unzipped_apk_path) + "Payload/#{@project_name}.app/*"
       # generate manifest (readable xml form)
       File.open(File.basename("AndroidManifest.xml"), 'wb') {|f| f.write (apk.manifest.to_xml) }
       if File.file?("AndroidManifest.xml")
@@ -107,7 +105,7 @@ module Polidea::Artifacts
       end
       #manifest end
 
-      
+
       # get icon
       icons = apk.icon # { "res/drawable-hdpi/ic_launcher.png" => "\x89PNG\x0D\x0A...", ... }
       name_most_x = 0

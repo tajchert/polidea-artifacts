@@ -4,9 +4,9 @@ require 'zip'
 require 'securerandom'
 require 'cfpropertylist'
 
+
 module Polidea::Artifacts
   class Processor
-
     attr_reader :project_name, :build_number, :build_version
 
     attr_accessor :obfuscate_file_names
@@ -92,7 +92,7 @@ module Polidea::Artifacts
       copy_artifact(path, artifact_paths)
 
       #Setup data
-      apk = Android::Apk.new(path)
+      apk = ::Android::Apk.new(path)
       @project_name = apk.manifest.label
       @build_number = apk.manifest.version_name
       @build_version = apk.manifest.version_code

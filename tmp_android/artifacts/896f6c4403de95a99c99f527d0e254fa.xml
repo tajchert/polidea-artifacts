@@ -1,0 +1,17 @@
+<manifest xmlns:android='http://schemas.android.com/apk/res/android' android:versionCode='3' android:versionName='0.3' package='pl.tajchert.faceboard'>
+    <application android:theme='@0x1030007' android:label='@0x7f060000' android:icon='@0x7f020000' android:hardwareAccelerated='true' android:largeHeap='true'>
+        <activity android:label='@0x7f060000' android:name='FdActivity' android:screenOrientation='0' android:configChanges='0xa0'>
+            <intent-filter>
+                <action android:name='android.intent.action.MAIN'/>
+                <category android:name='android.intent.category.LAUNCHER'/>
+            </intent-filter>
+        </activity>
+    </application>
+    <supports-screens android:anyDensity='true' android:smallScreens='true' android:normalScreens='true' android:largeScreens='true' android:resizeable='true'/>
+    <uses-sdk android:minSdkVersion='14'/>
+    <uses-permission android:name='android.permission.CAMERA'/>
+    <uses-feature android:name='android.hardware.camera' android:required='false'/>
+    <uses-feature android:name='android.hardware.camera.autofocus' android:required='false'/>
+    <uses-feature android:name='android.hardware.camera.front' android:required='false'/>
+    <uses-feature android:name='android.hardware.camera.front.autofocus' android:required='false'/>
+</manifest>

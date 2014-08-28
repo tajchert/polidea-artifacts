@@ -1,5 +1,5 @@
 
-module Android
+module  Polidea::Artifacts::Android
   class Dex
     # parsing dex object
     # @see http://source.android.com/devices/tech/dalvik/dex-format.html

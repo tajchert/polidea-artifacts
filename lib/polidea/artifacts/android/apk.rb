@@ -4,7 +4,7 @@ require 'digest/sha1'
 require 'digest/sha2'
 require 'openssl'
 
-module Android
+module Polidea::Artifacts::Android
   class NotApkFileError < StandardError; end
   class NotFoundError < StandardError; end
 
@@ -49,19 +49,19 @@ module Android
       @bindata.force_encoding(Encoding::ASCII_8BIT)
       raise NotApkFileError, "manifest file is not found." if @zip.find_entry(MANIFEST).nil?
       begin
-        @resource = Android::Resource.new(self.file(RESOURCE))
+        @resource =  Polidea::Artifacts::Android::Resource.new(self.file(RESOURCE))
       rescue => e
         $stderr.puts "failed to parse resource:#{e}"
         #$stderr.puts e.backtrace
       end
       begin
-        @manifest = Android::Manifest.new(self.file(MANIFEST), @resource)
+        @manifest =  Polidea::Artifacts::Android::Manifest.new(self.file(MANIFEST), @resource)
       rescue => e
         $stderr.puts "failed to parse manifest:#{e}"
         #$stderr.puts e.backtrace
       end
       begin
-        @dex = Android::Dex.new(self.file(DEX))
+        @dex =  Polidea::Artifacts::Android::Dex.new(self.file(DEX))
       rescue => e
         $stderr.puts "failed to parse dex:#{e}"
         #$stderr.puts e.backtrace

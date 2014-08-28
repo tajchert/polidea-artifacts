@@ -1,4 +1,4 @@
-module Android
+module  Polidea::Artifacts::Android
   class Dex
     class << self
       # parse uleb128(unsigned integer) data

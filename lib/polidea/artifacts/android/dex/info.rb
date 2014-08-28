@@ -1,6 +1,6 @@
 require_relative 'dex_object'
 
-module Android
+module  Polidea::Artifacts::Android
   class Dex
     # class information in dex
     # @!attribute [r] name

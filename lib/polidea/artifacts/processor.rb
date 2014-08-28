@@ -89,10 +89,10 @@ module Polidea::Artifacts
       end
 
       # copy apk to artifacts folder
-      copy_artifact(path, artifact_paths)
+      apk_pathname = copy_artifact(path, artifact_paths)
 
       #Setup data
-      apk = ::Android::Apk.new(path)
+      apk = Polidea::Artifacts::Android::Apk.new(path)
       @project_name = apk.manifest.label
       @build_number = apk.manifest.version_name
       @build_version = apk.manifest.version_code
@@ -112,7 +112,6 @@ module Polidea::Artifacts
       icons.each do |name, data|
         if (name.count "x")  > name_most_x
           name_most_x = name.count "x"
-          STDOUT.puts name.count "x"
           File.open(File.basename("icon.png"), 'wb') {|f| f.write data } # save to file.
         end
       end
@@ -130,7 +129,7 @@ module Polidea::Artifacts
       page_generator.image_url = "#{Pathname.new(icon_file_path).basename}"
 
       installation_page_url = Pathname.new(tmp_dir) + 'install.html'
-      File.open(installation_page_url, 'w') {|f| f.write(page_generator.generate_page_with_ipa_url(Pathname.new(@base_upload_url) + Pathname.new(upload_path) + manifest_path))}
+      File.open(installation_page_url, 'w') {|f| f.write(page_generator.generate_page_with_apk_url(Pathname.new(@base_upload_url) + Pathname.new(upload_path) + apk_pathname.basename))}
       copy_artifact(installation_page_url, artifact_paths)
     end
 
@@ -230,7 +229,7 @@ module Polidea::Artifacts
     end
 
     def tmp_apk_dir
-      @tmp_apk_dir ||= Pathname.new('tmp_android')
+      @tmp_apk_dir ||= Pathname.new('tmp')
     end
 
   end

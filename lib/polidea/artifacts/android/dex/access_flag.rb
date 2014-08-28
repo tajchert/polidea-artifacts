@@ -1,5 +1,5 @@
 
-module Android
+module  Polidea::Artifacts::Android
   class Dex
     # access flag object
     class AccessFlag

@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'stringio'
 
-module Android
+module  Polidea::Artifacts::Android
   # based on Android OS source code
   # /frameworks/base/include/utils/ResourceTypes.h
   # @see http://justanapplication.wordpress.com/category/android/android-resources/

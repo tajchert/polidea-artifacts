@@ -2,7 +2,7 @@ require 'rexml/document'
 require 'stringio'
 
 
-module Android
+module  Polidea::Artifacts::Android
   # binary AXML parser
   # @see https://android.googlesource.com/platform/frameworks/base.git Android OS frameworks source
   # @note

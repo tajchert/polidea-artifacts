@@ -2,7 +2,7 @@
 require 'ruby_apk'
 require 'rexml/document'
 
-module Android
+module  Polidea::Artifacts::Android
   class Layout
     # @return [Hash] { path => Layout }
     def self.collect_layouts(apk)

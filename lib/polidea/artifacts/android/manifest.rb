@@ -1,6 +1,6 @@
 require 'rexml/document'
 
-module Android
+module  Polidea::Artifacts::Android
   # parsed AndroidManifest.xml class
   # @see http://developer.android.com/guide/topics/manifest/manifest-intro.html
   class Manifest

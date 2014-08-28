@@ -32,7 +32,7 @@ module Polidea::Artifacts::Uploaders
       paths.each do |f|
         pathname = Pathname.new(processor.upload_path) + Pathname.new(f).basename
         obj = bucket.objects[pathname]
-        obj.write(Pathname.new(f))
+        obj.write(Pathname.new(f), :acl => :public_read)
       end
 
       file_mapping = {}

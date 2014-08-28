@@ -1,5 +1,6 @@
 require 'aws/s3'
 require 'fileutils'
+require 'rqrcode_png'
 
 module Polidea::Artifacts::Uploaders
 
@@ -42,6 +43,14 @@ module Polidea::Artifacts::Uploaders
         unless key.nil?
           pathname = pathname + "#{Pathname.new(artifact_path).basename}"
           file_mapping[key] = "#{pathname.to_s}"
+          if key.to_s == "installation_page"
+            puts pathname.to_s
+
+            qr = RQRCode::QRCode.new(pathname.to_s, :size => 12, :level => :h )
+            png = qr.to_img                                             # returns an instance of ChunkyPNG
+            png.resize(256, 256).save("qr_code.png")
+            #puts qr.to_s
+          end
         end
       end
 

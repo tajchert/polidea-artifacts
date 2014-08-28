@@ -24,9 +24,7 @@ module Polidea::Artifacts
 
     end
     def generate_page_with_apk_url(url)
-      puts url
       #ur_iencode = URI.encode_www_form_component(url)
-      puts url
       #itms_url = "itms-services://?action=download-manifest&amp;url=#{ur_iencode}"
       @installation_link = url
 

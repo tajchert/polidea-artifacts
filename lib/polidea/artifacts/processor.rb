@@ -68,7 +68,7 @@ module Polidea::Artifacts
       page_generator.image_url = "#{Pathname.new(icon_file_path).basename}"
 
       installation_page_url = Pathname.new(tmp_dir) + 'install.html'
-      File.open(installation_page_url, 'w') {|f| f.write(page_generator.generate_page_with_ipa_url(Pathname.new(@base_upload_url) + Pathname.new(upload_path) + manifest_path))}
+      File.open(installation_page_url, 'w') {|f| f.write(page_generator.generate_page_with_ipa_url(Pathname.new(@base_upload_url) + Pathname.new(upload_path) + manifest_path.basename))}
       copy_artifact(installation_page_url, artifact_paths)
     end
 

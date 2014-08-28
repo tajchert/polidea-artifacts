@@ -19,7 +19,7 @@ module Polidea::Artifacts::Uploaders
       s3 = AWS::S3.new(:access_key_id => @access_key, :secret_access_key => @secret, :region => @region)
       bucket = s3.buckets[@bucket]
 
-      bucket_url = bucket.url
+      bucket_url = bucket.url.sub 'http:', 'https:'
 
       puts bucket_url
 
@@ -32,7 +32,7 @@ module Polidea::Artifacts::Uploaders
       paths.each do |f|
         pathname = Pathname.new(processor.upload_path) + Pathname.new(f).basename
         obj = bucket.objects[pathname]
-        obj.write(Pathname.new(f))
+        obj.write(Pathname.new(f), :acl => :public_read)
       end
 
       file_mapping = {}

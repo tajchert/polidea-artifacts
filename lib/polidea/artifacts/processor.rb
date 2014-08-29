@@ -7,7 +7,7 @@ require 'cfpropertylist'
 
 module Polidea::Artifacts
   class Processor
-    attr_reader :project_name, :build_number, :build_version
+    attr_reader :project_name, :build_number, :build_version, :apk
 
     attr_accessor :obfuscate_file_names
 
@@ -92,22 +92,21 @@ module Polidea::Artifacts
       apk_pathname = copy_artifact(path, artifact_paths)
 
       #Setup data
-      apk = Polidea::Artifacts::Android::Apk.new(path)
+      @apk = Polidea::Artifacts::Android::Apk.new(path)
       @project_name = apk.manifest.label
       @build_number = apk.manifest.version_name
       @build_version = apk.manifest.version_code
 
       # generate manifest (readable xml form)
-      File.open(File.basename("AndroidManifest.xml"), 'wb') {|f| f.write (apk.manifest.to_xml) }
+      File.open(File.basename("AndroidManifest.xml"), 'wb') {|f| f.write (@apk.manifest.to_xml) }
       if File.file?("AndroidManifest.xml")
         manifest_path = copy_artifact("AndroidManifest.xml", artifact_paths)
         FileUtils.rm("AndroidManifest.xml")
       end
       #manifest end
 
-
       # get icon
-      icons = apk.icon # { "res/drawable-hdpi/ic_launcher.png" => "\x89PNG\x0D\x0A...", ... }
+      icons = @apk.icon # { "res/drawable-hdpi/ic_launcher.png" => "\x89PNG\x0D\x0A...", ... }
       name_most_x = 0
       icons.each do |name, data|
         if (name.count "x")  > name_most_x

@@ -20,13 +20,24 @@ module Polidea::Artifacts
       execute_command
     end
 
+    def email_generating(url, icon_address, apk)
+
+      configuration = Config.new
+      configuration.config.each_pair { |key, value|
+        puts "#{key} = #{value}"
+      }
+
+      mail_generator = Polidea::Artifacts::MailGenerator.new(url, icon_address, apk)
+      mail_generator.send_mail(configuration.config['email'])
+    end
+
     def upload
       if aws_key && aws_secret && aws_bucket && aws_region
         uploader = Uploaders::S3Uploader.new(aws_key, aws_bucket, aws_region, aws_secret)
         uploader.obfuscate_names = obfuscate_names
         uploader.upload(artifact)
-        config = Config.new
 
+        email_generating(uploader.installation_website_url, uploader.image_url, uploader.apk)
         return 0
       elsif dropbox_token
         Uploaders::DropboxUploader.new.upload(artifact, dropbox_token)

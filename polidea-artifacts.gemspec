@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'dropbox-sdk',        '~> 1.6.4'
   s.add_dependency 'rqrcode_png',        '~> 0.1.2'
   s.add_dependency 'shorturl',           '~> 1.0.0'
+  s.add_dependency 'mailgun-ruby',       '~> 1.0.2'
 
   s.add_development_dependency 'rspec'
 

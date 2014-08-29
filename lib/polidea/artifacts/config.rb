@@ -10,6 +10,9 @@ module Polidea::Artifacts
       @config = Hash.new
       if File.exists?(config_path)
         @config = YAML.load_file(config_path)
+        @config.each do |key, value|
+          puts key + " - " + value
+        end
         puts @config.inspect
       else
         @config = {}

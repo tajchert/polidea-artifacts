@@ -6,7 +6,7 @@ module Polidea::Artifacts::Uploaders
 
   class S3Uploader
 
-    attr_accessor :obfuscate_names
+    attr_accessor :obfuscate_names, :installation_website_url, :image_url, :apk
 
     def initialize(aws_access_key, aws_bucket, aws_region, aws_secret)
       @access_key = aws_access_key
@@ -27,6 +27,7 @@ module Polidea::Artifacts::Uploaders
       # TODO check how to do it better
       processor = Polidea::Artifacts::Processor.new(bucket_url)
       processor.obfuscate_file_names = obfuscate_names
+
       paths = processor.process_paths!([path])
       upload_path = Pathname.new(bucket_url) + processor.upload_path
 
@@ -35,8 +36,8 @@ module Polidea::Artifacts::Uploaders
         obj = bucket.objects[pathname]
         obj.write(Pathname.new(f), :acl => :public_read)
       end
+      @apk = processor.apk
 
-      mail_generator = Polidea::Artifacts::MailGenerator.new
       #mail_generator.folder_loc = upload_path
       # mail_generator.app_version = @build_version
       # mail_generator.image_url = "#{Pathname.new(icon_file_path).basename}"
@@ -50,14 +51,14 @@ module Polidea::Artifacts::Uploaders
           puts key.to_s
           puts pathname.to_s
           if key.to_s == "installation_page"
-            mail_generator.installation_website_url = pathname.to_s
+            @installation_website_url = pathname.to_s
           end
           if key.to_s == "icon"
-            mail_generator.image_url = pathname.to_s
+            @image_url = pathname.to_s
           end
         end
       end
-      mail_generator.generate_qr_code(mail_generator.installation_website_url)
+
 
 
       puts '====='
